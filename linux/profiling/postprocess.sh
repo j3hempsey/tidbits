@@ -8,27 +8,25 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 usage() {
 	cat <<-EOF
-	Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] -f <filename>
+	Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] <sar-data-filename>
 
 	This script processes a sar data file and outputs corresponding charts for captured data.
 
-	Required:
-	-f, --file       File name of sar data
-
 	Available options:
 
-	    --auto-range Let gnuplot decide the best ranges to use for the y-axis of plots
+	    --auto-range Let gnuplot decide the best ranges to use for the y-axis of plots.
+	-o, --out-dir    Processing output directory (will be created).
 
 	Available quantization outputs:
 
-	-a, --all        All available analysis
-	-c, --cpu        CPU analysis and plotting
-	-m, --mem        Memory analysis and plotting
-	-i, --io         I/O analysis and plotting
+	-a, --all        All available analysis.
+	-c, --cpu        CPU analysis and plotting.
+	-m, --mem        Memory analysis and plotting.
+	-i, --io         I/O analysis and plotting.
 
 	Misc:
-	-h, --help       Print this help and exit
-	-v, --verbose    Print script debug info
+	-h, --help       Print this help and exit.
+	-v, --verbose    Print script debug info,
 	EOF
 	exit
 }
@@ -68,12 +66,12 @@ parse_params() {
 
 	while :; do
 		case "${1-}" in
-			-f | --file)
-				filename="${2-}"
-				shift
-				;;
 			# Options
 			--auto-range) autorange=1 ;;
+			-o | --out-dir)
+				outdir="${2-}"
+				shift
+				;;
 			# Metrics
 			-a | --all)
 				cpu=1
@@ -93,13 +91,13 @@ parse_params() {
 		shift
 	done
 
-	# shellcheck disable=SC2034
 	args=("$@")
 
 	# check required params and arguments
+	[[ ${#args[@]} -eq 0 ]] && die "Missing sar data file."
+	filename=${args[0]}
 	[[ -z "${filename-}" ]] && die "Missing required parameter: --file"
 	[[ ! -f "$filename" ]] && die "$filename does not exist!"
-	# [[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
 
 	return 0
 }
@@ -112,7 +110,7 @@ parse_params "$@"
 setup_colors
 
 # script logic here
-outdir="$(date +"%Y%m%d_%H%M").proc"
+outdir="${outdir:-$(date +"%Y%m%d_%H%M").proc}"
 msg "${BLUE}Performing analysis of sar data from:${NOFORMAT} $filename"
 if (( cpu )); then
 	msg "${BLUE}Plotting CPU data${NOFORMAT}"
