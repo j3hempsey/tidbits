@@ -10,7 +10,7 @@ a very simple but powerful performance analysis tool.
 ### Prerequisites
 
 ```
-sudo apt install sysstat gnuplot
+sudo apt install sysstat gnuplot gawk
 ```
 
 ### Getting Started

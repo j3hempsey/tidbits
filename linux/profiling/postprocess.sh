@@ -52,7 +52,7 @@ msg() {
 die() {
 	local msg=$1
 	local code=${2-1} # default exit status 1
-	msg "$msg"
+	msg "${RED}$msg${NOFORMAT}"
 	exit "$code"
 }
 
@@ -103,15 +103,25 @@ parse_params() {
 }
 
 sadf-post() {
-	sadf -dh "$@"
+	# It seems that in some cases sar can record a date in the past (epoch 0), use awk to filter our
+	# data to ensure the time is always increasing.
+	sadf -dh "$@" |
+		awk -F\; 'BEGIN { date=0 };
+					/^#/ { print $0 };
+					!/^#/{ if ($3 > date) { print $0; date=$3 } }'
 }
 
 parse_params "$@"
 setup_colors
 
+if ! gawk --version &>/dev/null; then
+	die "gawk must be installed!"
+fi
+
 # script logic here
 outdir="${outdir:-$(date +"%Y%m%d_%H%M").proc}"
 msg "${BLUE}Performing analysis of sar data from:${NOFORMAT} $filename"
+msg "${BLUE}Output directory:${NOFORMAT} $outdir"
 if (( cpu )); then
 	msg "${BLUE}Plotting CPU data${NOFORMAT}"
 	plot_out_dir="$outdir/cpu"
