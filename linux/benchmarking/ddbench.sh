@@ -1,7 +1,13 @@
 #!/bin/bash
 #GB
 size=40
-file_prefix=ddbench
+file_prefix=dd-bench
+
+if ! type sar &>/dev/null; then
+	echo "sar (sysstat package) needs to be installed"
+	exit 1
+fi
+
 (
 	sar -A -o "$file_prefix.dd.dat" 1 &> /dev/null
 ) &

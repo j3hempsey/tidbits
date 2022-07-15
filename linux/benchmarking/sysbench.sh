@@ -1,6 +1,17 @@
 #!/bin/bash
-size=16GB
-file_prefix=bench
+size=40GB
+file_prefix=test-sysbench
+
+if ! type sar &>/dev/null; then
+	echo "sar (sysstat package) needs to be installed"
+	exit 1
+fi
+
+if ! type sysbench &>/dev/null; then
+	echo "sysbench needs to be installed"
+	exit 1
+fi
+
 sysbench fileio --file-test-mode=rndrw --file-total-size="$size" prepare
 (
 	sar -A -o "$file_prefix.sysbench.dat" 1 &> /dev/null
