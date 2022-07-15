@@ -1,0 +1,15 @@
+name: "Create TODOs"
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-todos:
+    name: "Create TODOs"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v2"
+      - name: "TODO to Issue"
+        uses: "alstr/todo-to-issue-action@v4.6.3"
+        id: "todo"
