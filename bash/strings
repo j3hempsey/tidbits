@@ -1,0 +1,7 @@
+t="ASDASD123"
+# Remove a prefix
+# # is shortest match ## is longest match
+echo "${t#ASD}"
+# Remove a suffix
+# % is shortest match %% is longest match
+echo "${t%123}"
